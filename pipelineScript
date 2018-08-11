@@ -1,0 +1,22 @@
+node{
+    def mvnHOME = tool name: 'maven3.5', type: 'maven'
+    def mvn = "${mvnHOME}/bin/mvn"
+    stage('Checkout Branch'){
+       
+        sh "echo hola ${params.branch}"
+        git branch: "${params.branch}", url: 'https://github.com/jnarino/demoEAFIT'
+    }
+    
+    stage('build'){
+        
+        sh "echo corriendo mvn"
+        sh "${mvn} clean install test-compile "
+        
+    }
+    stage('Publish'){
+       
+        sh "echo inicia publicacion"
+        sh "aws s3 cp 'target/demo-0.0.1-SNAPSHOT.jar' s3://artifacts-psl-4/application-${params.branch}-${BUILD_NUMBER}.jar --profile ohio"
+    }
+}
+   
