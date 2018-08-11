@@ -7,7 +7,7 @@ node{
     
     stage('eliminar despliegues anteriores'){
         withCredentials([file(credentialsId: 'psl4', variable: 'keypsl4')]) {
-            sh "ssh -i ${env.keypsl4} -o StrictHostKeyChecking=no ec2-user@18.222.173.72 'pkill -f java ||true'"
+            sh "ssh -i ${env.keypsl4} -o StrictHostKeyChecking=no ec2-user@18.222.173.72 'killall java || true'"
         }
     }
     
@@ -25,4 +25,3 @@ node{
     
 }
     
-  
