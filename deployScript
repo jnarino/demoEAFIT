@@ -1,0 +1,28 @@
+node{
+    stage('Download'){
+       
+        sh "echo inicia extraccion"
+        sh "aws s3 cp s3://artifacts-psl-4/application-develop-${params.version}.jar . --profile ohio"
+    }
+    
+    stage('eliminar despliegues anteriores'){
+        withCredentials([file(credentialsId: 'psl4', variable: 'keypsl4')]) {
+            sh "ssh -i ${env.keypsl4} -o StrictHostKeyChecking=no ec2-user@18.222.173.72 'pkill -f java ||true'"
+        }
+    }
+    
+    stage('Copying to server'){
+        withCredentials([file(credentialsId: 'psl4', variable: 'keypsl4')]) {
+            sh "scp -i ${env.keypsl4} -o StrictHostKeyChecking=no application-develop-${params.version}.jar ec2-user@18.222.173.72:/home/ec2-user"
+        }
+    }
+    
+    stage('Deploy'){
+        withCredentials([file(credentialsId: 'psl4', variable: 'keypsl4')]) {
+            sh "ssh -i ${env.keypsl4} -o StrictHostKeyChecking=no ec2-user@18.222.173.72 'java -jar application-develop-${params.version}.jar'"
+        }
+    }
+    
+}
+    
+  
